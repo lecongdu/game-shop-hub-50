@@ -33,6 +33,8 @@ const Dashboard = () => {
   const { data: orders, isLoading: ordersLoading } = useMyOrders();
   const { data: deposits, isLoading: depositsLoading } = useMyDeposits();
   const createDeposit = useCreateDeposit();
+  const { data: depositConfig } = useSiteSettings("deposit_config");
+  const depCfg = depositConfig?.value as Record<string, unknown> | undefined;
 
   const [depositAmount, setDepositAmount] = useState("");
   const [bankRef, setBankRef] = useState("");
