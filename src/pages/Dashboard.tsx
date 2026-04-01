@@ -107,10 +107,10 @@ const Dashboard = () => {
                 <div className="space-y-4">
                   <div className="rounded-lg bg-primary/10 border border-primary/20 p-3 text-sm space-y-1">
                     <p className="text-primary font-semibold">Thông tin chuyển khoản:</p>
-                    <p className="text-muted-foreground">Ngân hàng: <span className="text-foreground">Vietcombank</span></p>
-                    <p className="text-muted-foreground">STK: <span className="text-foreground font-mono">1234567890</span></p>
-                    <p className="text-muted-foreground">Chủ TK: <span className="text-foreground">ACCSHOP</span></p>
-                    <p className="text-muted-foreground">Nội dung: <span className="text-foreground font-mono">NAP {user?.id?.slice(0, 8)}</span></p>
+                    <p className="text-muted-foreground">Ngân hàng: <span className="text-foreground">{(depCfg?.bank_name as string) || "Vietcombank"}</span></p>
+                    <p className="text-muted-foreground">STK: <span className="text-foreground font-mono">{(depCfg?.account_number as string) || "1234567890"}</span></p>
+                    <p className="text-muted-foreground">Chủ TK: <span className="text-foreground">{(depCfg?.account_holder as string) || "ACCSHOP"}</span></p>
+                    <p className="text-muted-foreground">Nội dung: <span className="text-foreground font-mono">{(depCfg?.note_prefix as string) || "NAP"} {user?.id?.slice(0, 8)}</span></p>
                   </div>
                   <div>
                     <Label className="text-muted-foreground">Số tiền nạp (VNĐ)</Label>
