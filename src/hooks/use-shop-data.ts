@@ -309,7 +309,7 @@ export const useUpdateSiteSettings = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ key, value }: { key: string; value: Record<string, unknown> }) => {
-      const { error } = await supabase.from("site_settings").update({ value, updated_at: new Date().toISOString() }).eq("key", key);
+      const { error } = await supabase.from("site_settings").update({ value: value as unknown as import("@/integrations/supabase/types").Json, updated_at: new Date().toISOString() }).eq("key", key);
       if (error) throw error;
     },
     onSuccess: () => {
