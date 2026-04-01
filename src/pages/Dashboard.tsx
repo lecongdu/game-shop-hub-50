@@ -41,8 +41,9 @@ const Dashboard = () => {
 
   const handleDeposit = async () => {
     const amount = parseInt(depositAmount);
-    if (!amount || amount < 10000) {
-      toast.error("Số tiền nạp tối thiểu 10,000 VNĐ");
+    const minAmount = Number(depCfg?.min_amount) || 10000;
+    if (!amount || amount < minAmount) {
+      toast.error(`Số tiền nạp tối thiểu ${formatVND(minAmount)}`);
       return;
     }
     if (!bankRef.trim()) {
