@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { useProfile, useMyOrders, useMyDeposits, useCreateDeposit, formatVND } from "@/hooks/use-shop-data";
+import { useProfile, useMyOrders, useMyDeposits, useCreateDeposit, formatVND, useSiteSettings } from "@/hooks/use-shop-data";
 import { ShoppingBag, Wallet, User, Calendar, CreditCard, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -33,14 +33,17 @@ const Dashboard = () => {
   const { data: orders, isLoading: ordersLoading } = useMyOrders();
   const { data: deposits, isLoading: depositsLoading } = useMyDeposits();
   const createDeposit = useCreateDeposit();
+  const { data: depositConfig } = useSiteSettings("deposit_config");
+  const depCfg = depositConfig?.value as Record<string, unknown> | undefined;
 
   const [depositAmount, setDepositAmount] = useState("");
   const [bankRef, setBankRef] = useState("");
 
   const handleDeposit = async () => {
     const amount = parseInt(depositAmount);
-    if (!amount || amount < 10000) {
-      toast.error("Số tiền nạp tối thiểu 10,000 VNĐ");
+    const minAmount = Number(depCfg?.min_amount) || 10000;
+    if (!amount || amount < minAmount) {
+      toast.error(`Số tiền nạp tối thiểu ${formatVND(minAmount)}`);
       return;
     }
     if (!bankRef.trim()) {
@@ -104,10 +107,10 @@ const Dashboard = () => {
                 <div className="space-y-4">
                   <div className="rounded-lg bg-primary/10 border border-primary/20 p-3 text-sm space-y-1">
                     <p className="text-primary font-semibold">Thông tin chuyển khoản:</p>
-                    <p className="text-muted-foreground">Ngân hàng: <span className="text-foreground">Vietcombank</span></p>
-                    <p className="text-muted-foreground">STK: <span className="text-foreground font-mono">1234567890</span></p>
-                    <p className="text-muted-foreground">Chủ TK: <span className="text-foreground">ACCSHOP</span></p>
-                    <p className="text-muted-foreground">Nội dung: <span className="text-foreground font-mono">NAP {user?.id?.slice(0, 8)}</span></p>
+                    <p className="text-muted-foreground">Ngân hàng: <span className="text-foreground">{(depCfg?.bank_name as string) || "Vietcombank"}</span></p>
+                    <p className="text-muted-foreground">STK: <span className="text-foreground font-mono">{(depCfg?.account_number as string) || "1234567890"}</span></p>
+                    <p className="text-muted-foreground">Chủ TK: <span className="text-foreground">{(depCfg?.account_holder as string) || "ACCSHOP"}</span></p>
+                    <p className="text-muted-foreground">Nội dung: <span className="text-foreground font-mono">{(depCfg?.note_prefix as string) || "NAP"} {user?.id?.slice(0, 8)}</span></p>
                   </div>
                   <div>
                     <Label className="text-muted-foreground">Số tiền nạp (VNĐ)</Label>

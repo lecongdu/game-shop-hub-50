@@ -241,6 +241,83 @@ export const useIsAdmin = () => {
   });
 };
 
+// ==================== Admin: Members ====================
+export const useAdminMembers = () =>
+  useQuery({
+    queryKey: ["admin_members"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+export const useAdminUpdateBalance = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, balance }: { userId: string; balance: number }) => {
+      const { error } = await supabase.from("profiles").update({ balance }).eq("user_id", userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin_members"] });
+    },
+  });
+};
+
+export const useAdminSetRole = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: "admin" | "user" }) => {
+      // Check if role exists
+      const { data: existing } = await supabase.from("user_roles").select("*").eq("user_id", userId).eq("role", role);
+      if (existing && existing.length > 0) return; // already has role
+      // Remove old roles and set new one
+      const { error: delErr } = await supabase.from("user_roles").delete().eq("user_id", userId);
+      if (delErr) throw delErr;
+      const { error } = await supabase.from("user_roles").insert({ user_id: userId, role });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin_members"] });
+    },
+  });
+};
+
+export const useAdminMemberRoles = () =>
+  useQuery({
+    queryKey: ["admin_member_roles"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("user_roles").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+// ==================== Site Settings ====================
+export const useSiteSettings = (key: string) =>
+  useQuery({
+    queryKey: ["site_settings", key],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("site_settings").select("*").eq("key", key).single();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+export const useUpdateSiteSettings = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ key, value }: { key: string; value: Record<string, unknown> }) => {
+      const { error } = await supabase.from("site_settings").update({ value: value as unknown as import("@/integrations/supabase/types").Json, updated_at: new Date().toISOString() }).eq("key", key);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["site_settings"] });
+    },
+  });
+};
+
 // ==================== Admin Stats ====================
 export const useAdminStats = () =>
   useQuery({
