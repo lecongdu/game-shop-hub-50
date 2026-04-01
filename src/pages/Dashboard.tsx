@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { useProfile, useMyOrders, useMyDeposits, useCreateDeposit, formatVND } from "@/hooks/use-shop-data";
+import { useProfile, useMyOrders, useMyDeposits, useCreateDeposit, formatVND, useSiteSettings } from "@/hooks/use-shop-data";
 import { ShoppingBag, Wallet, User, Calendar, CreditCard, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
